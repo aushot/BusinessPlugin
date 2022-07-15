@@ -1,0 +1,44 @@
+#DATABASE
+password: ""
+port: 3306
+database: "businessplugin"
+username: "root"
+host: "localhost"
+usessl: "false"
+
+#mostra quanti soldi ha l'azienda
+showbusinessmoney: "L'azienda $b ha $m"
+
+businessexist: "L'azienda esiste già"
+
+businessnotexist: "L'azienda non esiste"
+
+nomoneyleft: "Non hai soldi sufficienti"
+
+nomoneyleftbusiness: "Non ci sono soldi sufficienti nella tua azienda"
+
+nopermission: "Non hai i permessi"
+
+invalidcommand: "Comando errato"
+
+businessdeleted: "L'azienda è stata rimossa"
+
+businesscreated: "L'azienda è stata creata"
+
+sqlerror: "Error!"
+
+aziendalist: "   &aP_IVA   - &cNOME AZIENDA"
+
+aziendalistlayout: "    $v    - $n" #v -> vat azienda ||||||||  $n -> business name
+
+
+playernotonline: "Il player non e' online"
+arleadyemployer: "Il player e' gia' dipendente"
+employerdeleted: "Hai licenziato un dipendente"
+employernotinthatbusiness: "E' dipendente in un'altra azienda"
+notemployer: "Non sei dipendente"
+employeradd: "Hai assunto un dipendente"
+playernotemployer: "Il player non e' dipendente"
+receiptname: "&cScontrino"
+importlinereceipt: "&aImporto scontrino: $p $"
+descriptionlinereceipt: "&bDescrizione: $d"

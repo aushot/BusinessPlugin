@@ -1,0 +1,16 @@
+name: BusinessPlugin
+version: '${project.version}'
+main: me.shotwolf.businessplugin.Main
+authors: [ aushot ]
+description: chat for business
+commands:
+  conto:
+    description:
+  azienda:
+    description:
+  chat:
+    description:
+  scontrino:
+    description:
+  contratto:
+    description:
