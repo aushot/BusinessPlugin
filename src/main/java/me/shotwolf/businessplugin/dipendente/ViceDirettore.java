@@ -11,7 +11,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.UUID;
 
-public class Direttore {
+public class ViceDirettore {
     private UUID uuid;
     private Azienda azienda;
 
@@ -20,14 +20,14 @@ public class Direttore {
     private Main main;
     private ConfigFile cf;
 
-    public Direttore(Main main, UUID uuid) {
+    public ViceDirettore(Main main, UUID uuid) {
         utilsDbStatement = new UtilsDbStatement(main);
         utilsChat = new UtilsChat();
 
         this.main = main;
 
         try {
-            PreparedStatement statement = utilsDbStatement.preparedStatement("SELECT uuid, p_iva_azienda, nome_azienda FROM Direttori, Azienda WHERE p_iva_azienda = p_iva AND uuid = ?;");
+            PreparedStatement statement = utilsDbStatement.preparedStatement("SELECT uuid, p_iva_azienda, nome_azienda FROM Vicedirettori, Azienda WHERE p_iva_azienda = p_iva AND uuid = ?;");
             statement.setString(1, String.valueOf(uuid));
             ResultSet rs = statement.executeQuery();
             if (rs.next()) {
@@ -39,25 +39,25 @@ public class Direttore {
             e.printStackTrace();
         }
     }
-    public Direttore(Main main, UUID uuid, Azienda azienda, Player p) {
+    public ViceDirettore(Main main, UUID uuid, Azienda azienda, Player p) {
         cf = new ConfigFile(main);
         utilsDbStatement = new UtilsDbStatement(main);
         utilsChat = new UtilsChat();
         this.main = main;
 
-            try {
-                PreparedStatement statement1 = utilsDbStatement.preparedStatement("INSERT INTO Direttori (uuid, p_iva_azienda) VALUES (?, ?)");
-                statement1.setString(1, String.valueOf(uuid));
-                statement1.setInt(2, azienda.getP_iva());
-                statement1.executeUpdate();
+        try {
+            PreparedStatement statement1 = utilsDbStatement.preparedStatement("INSERT INTO Vicedirettori (uuid, p_iva_azienda) VALUES (?, ?)");
+            statement1.setString(1, String.valueOf(uuid));
+            statement1.setInt(2, azienda.getP_iva());
+            statement1.executeUpdate();
 
-                utilsChat.sendMessage(p ,cf.getDirectorAdded().replace("$b", azienda.getName())); //direttoreadd
-            } catch (SQLException e){
-                e.printStackTrace();
-            }
+            utilsChat.sendMessage(p ,cf.getViceDirectorAdded().replace("$b", azienda.getName())); //direttoreadd //vicedirettore
+        } catch (SQLException e){
+            e.printStackTrace();
+        }
 
         try {
-            PreparedStatement statement2 = utilsDbStatement.preparedStatement("SELECT uuid, p_iva_azienda FROM Direttori WHERE uuid = ?;");
+            PreparedStatement statement2 = utilsDbStatement.preparedStatement("SELECT uuid, p_iva_azienda FROM Vicedirettori WHERE uuid = ?;");
             statement2.setString(1, String.valueOf(uuid));
             ResultSet rs2 = statement2.executeQuery();
             if (rs2.next()) {
@@ -89,7 +89,7 @@ public class Direttore {
     public boolean isInDB(String uuid) {
         try {
 
-            PreparedStatement statement = utilsDbStatement.preparedStatement("SELECT uuid, p_iva_azienda FROM Direttori WHERE uuid = ?;");
+            PreparedStatement statement = utilsDbStatement.preparedStatement("SELECT uuid, p_iva_azienda FROM Vicedirettori WHERE uuid = ?;");
             statement.setString(1, uuid);
             ResultSet rs = statement.executeQuery();
 

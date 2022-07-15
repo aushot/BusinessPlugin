@@ -1,12 +1,9 @@
 package me.shotwolf.businessplugin;
 
 import me.shotwolf.businessplugin.commands.*;
-import me.shotwolf.businessplugin.dipendente.Direttore;
+import me.shotwolf.businessplugin.dipendente.*;
 import me.shotwolf.businessplugin.listener.ChatEventListener;
 import me.shotwolf.businessplugin.database.Database;
-import me.shotwolf.businessplugin.dipendente.Azienda;
-import me.shotwolf.businessplugin.dipendente.Dipendente;
-import me.shotwolf.businessplugin.dipendente.PlayerManager;
 import net.luckperms.api.LuckPerms;
 import net.milkbowl.vault.economy.Economy;
 import org.bukkit.Bukkit;
@@ -62,10 +59,11 @@ public final class Main extends JavaPlugin {
         loadBusiness();
         loadDipendenti();
         loadDirettori();
+        loadViceDirettori();
 
         Bukkit.getPluginManager().registerEvents(new ChatEventListener(this), this);
 
-        Bukkit.getScheduler().runTaskTimer(this, () -> {
+        /* Bukkit.getScheduler().runTaskTimer(this, () -> { X DOPO
 
             for(Player p : Bukkit.getOnlinePlayers()){
                 if(contratto.containsKey(getPlayerManager().getDipendente(p.getUniqueId()))) {
@@ -73,7 +71,7 @@ public final class Main extends JavaPlugin {
                     p.sendMessage("Hai ricevuto la tua paga di " + contratto.get(getPlayerManager().getDipendente(p.getUniqueId())));
                 }
             }
-        }, 20*1, 20*1);
+        }, 20*1, 20*1); */
     }
     @Override
     public void onDisable() {
@@ -182,6 +180,25 @@ public final class Main extends JavaPlugin {
                 direttore.setUuid(UUID.fromString(uuid));
 
                 playerManager.addDirettore(UUID.fromString(uuid), direttore);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void loadViceDirettori(){
+        try {
+            PreparedStatement statement = getDatabase().getConnection().prepareStatement("SELECT uuid, nome_azienda FROM Vicedirettori, Azienda WHERE p_iva_azienda=p_iva;"); //load vicedirettori on Player Manager (HashMap)
+            ResultSet rs = statement.executeQuery();
+            while (rs.next()) {
+                String uuid = rs.getString("uuid");
+                String nome_azienda = rs.getString("nome_azienda");
+
+                ViceDirettore vicedirettore = new ViceDirettore(this, UUID.fromString(uuid));
+                vicedirettore.setAzienda(getPlayerManager().getAzienda(nome_azienda));
+                vicedirettore.setUuid(UUID.fromString(uuid));
+
+                playerManager.addViceDirettore(UUID.fromString(uuid), vicedirettore);
             }
         } catch (SQLException e) {
             e.printStackTrace();

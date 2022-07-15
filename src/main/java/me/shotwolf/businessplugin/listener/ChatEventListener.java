@@ -21,8 +21,18 @@ public class ChatEventListener implements Listener {
         if(main.getBusinesschat().containsKey(e.getPlayer().getUniqueId())){
             e.setCancelled(true);
             for(Player p : Bukkit.getOnlinePlayers()){
-                if(main.getPlayerManager().getDipendente(p.getUniqueId()) != null && main.getPlayerManager().getDipendente(p.getUniqueId()).getAzienda() == main.getBusinesschat().get(from.getUniqueId())){
-                    utilsChat.sendMessage(p, from.getDisplayName() + ": &a" + e.getMessage());
+                if(main.getPlayerManager().getDipendente(p.getUniqueId()) != null){
+                    if (main.getPlayerManager().getDipendente(p.getUniqueId()).getAzienda() == main.getBusinesschat().get(from.getUniqueId())) {
+                        utilsChat.sendMessage(p, from.getDisplayName() + ": &a" + e.getMessage());
+                    }
+                } else if (main.getPlayerManager().getDirettore(p.getUniqueId()) != null) {
+                    if (main.getPlayerManager().getDirettore(p.getUniqueId()).getAzienda() == main.getBusinesschat().get(from.getUniqueId())) {
+                        utilsChat.sendMessage(p, from.getDisplayName() + ": &a" + e.getMessage());
+                    }
+                } else if (main.getPlayerManager().getViceDirettore(p.getUniqueId()) != null) {
+                    if (main.getPlayerManager().getViceDirettore(p.getUniqueId()).getAzienda() == main.getBusinesschat().get(from.getUniqueId())) {
+                        utilsChat.sendMessage(p, from.getDisplayName() + ": &a" + e.getMessage());
+                    }
                 }
             }
         }

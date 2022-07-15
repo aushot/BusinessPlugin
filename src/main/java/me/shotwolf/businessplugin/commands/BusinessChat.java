@@ -26,15 +26,28 @@ public class BusinessChat implements CommandExecutor {
             Player p = (Player) sender;
             UUID uuid = p.getUniqueId();
 
-            if (main.getPlayerManager().getDipendente(uuid) != null) {
-                String nome_azienda = main.getPlayerManager().getDipendente(uuid).getAzienda().getName().toLowerCase();
-                Azienda azienda = main.getPlayerManager().getDipendente(p.getUniqueId()).getAzienda();
+            if (main.getPlayerManager().getDipendente(uuid) != null || main.getPlayerManager().getViceDirettore(uuid) != null || main.getPlayerManager().getDirettore(uuid) != null) {
+                String nome_azienda = null;
+                Azienda azienda = null;
 
-                if (p.hasPermission("direttore." + nome_azienda) || p.hasPermission("dipendente." + nome_azienda)) {
+                if(main.getPlayerManager().getDipendente(uuid) != null ){
+                    nome_azienda = main.getPlayerManager().getDipendente(uuid).getAzienda().getName().toLowerCase();
+                    azienda = main.getPlayerManager().getDipendente(p.getUniqueId()).getAzienda();
+                } else if(main.getPlayerManager().getViceDirettore(uuid) != null) {
+                    nome_azienda = main.getPlayerManager().getViceDirettore(uuid).getAzienda().getName().toLowerCase();
+                    azienda = main.getPlayerManager().getViceDirettore(p.getUniqueId()).getAzienda();
+                } else if(main.getPlayerManager().getDirettore(uuid) != null) {
+                    nome_azienda = main.getPlayerManager().getDirettore(uuid).getAzienda().getName().toLowerCase();
+                    azienda = main.getPlayerManager().getDirettore(p.getUniqueId()).getAzienda();
+                }
+
+                if (p.hasPermission("direttore." + nome_azienda) || p.hasPermission("vicedirettore." + nome_azienda) || p.hasPermission("dipendente." + nome_azienda)) {
                     if (!main.getBusinesschat().containsKey(uuid)) {
                         main.getBusinesschat().put(uuid, azienda);
+                        utilsChat.sendMessage(p, cf.getChatbusinessActivated());
                     } else {
                         main.getBusinesschat().remove(uuid);
+                        utilsChat.sendMessage(p, cf.getChatbusinessDeactivated());
                     }
                 } else {
                     utilsChat.sendMessage(p, cf.getNoPermission());

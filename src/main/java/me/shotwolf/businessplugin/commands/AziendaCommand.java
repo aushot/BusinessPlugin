@@ -5,6 +5,7 @@ import me.shotwolf.businessplugin.configfile.ConfigFile;
 import me.shotwolf.businessplugin.dipendente.Azienda;
 import me.shotwolf.businessplugin.dipendente.Dipendente;
 import me.shotwolf.businessplugin.dipendente.Direttore;
+import me.shotwolf.businessplugin.dipendente.ViceDirettore;
 import me.shotwolf.businessplugin.utils.UtilsChat;
 import net.luckperms.api.model.user.User;
 import net.luckperms.api.node.Node;
@@ -86,7 +87,7 @@ public class AziendaCommand implements CommandExecutor {
                                         utilsChat.sendMessage(p, cf.getSQLError());
                                     }
                                 } else {
-                                    utilsChat.sendMessage(p, "Sei già direttore di un' altra azienda");
+                                    utilsChat.sendMessage(p, cf.getArleadyDirector());
                                 }
                                 return true;
                             case "delete":
@@ -116,10 +117,46 @@ public class AziendaCommand implements CommandExecutor {
                         if (main.getPlayerManager().getAzienda(nome_azienda) != null) {
                             if (Bukkit.getServer().getPlayer(args[2]) != null) {
                                 User user;
+                                UUID target = Bukkit.getServer().getPlayerExact(args[2]).getUniqueId();
+
                                 switch (args[1].toLowerCase()) {
+                                    case "promote": //azienda (AZIENDA) promote/degrade (PLAYER)
+                                        if(main.getPlayerManager().getDipendente(target) != null){
+                                            if(main.getPlayerManager().getDipendente(target).getAzienda().getName().equalsIgnoreCase(nome_azienda)){
+                                                Azienda azienda = main.getPlayerManager().getAzienda(nome_azienda);
+                                                user = main.getApi().getUserManager().getUser(target);
+
+                                                addPermission(user, "vicedirettore." + nome_azienda.toLowerCase());
+                                                removePermission(user, "dipendente." + nome_azienda.toLowerCase());
+                                                main.getPlayerManager().removeDipendente(main, target);
+
+                                                ViceDirettore viceDirettore = new ViceDirettore(main, target, azienda, Bukkit.getPlayer(target));
+                                                main.getPlayerManager().addViceDirettore(target, viceDirettore);
+
+                                                utilsChat.sendMessage(p, cf.getSubDirectorAdded());
+                                            }
+                                        }
+                                        return true;
+                                    case "degrade":
+                                        if(main.getPlayerManager().getViceDirettore(target) != null){
+                                            if(main.getPlayerManager().getViceDirettore(target).getAzienda().getName().equalsIgnoreCase(nome_azienda)){
+                                                Azienda azienda = main.getPlayerManager().getAzienda(nome_azienda);
+                                                user = main.getApi().getUserManager().getUser(target);
+
+                                                main.getPlayerManager().removeViceDirettore(main, target);
+                                                removePermission(user, "vicedirettore." + nome_azienda.toLowerCase());
+
+                                                addPermission(user, "dipendente." + nome_azienda.toLowerCase());
+                                                Dipendente dipendente = new Dipendente(main, target, azienda, p);
+                                                main.getPlayerManager().addDipendente(target, dipendente);
+
+                                                utilsChat.sendMessage(p, cf.getSubDirectorRemoved());
+                                            }
+                                        }
+                                        return true;
                                     case "add":
-                                        UUID target = Bukkit.getServer().getPlayerExact(args[2]).getUniqueId();
-                                        if(main.getPlayerManager().getDirettore(target) == null ) {
+                                        if(main.getPlayerManager().getDirettore(target) == null) {
+
                                             Azienda azienda = main.getPlayerManager().getAzienda(nome_azienda);
 
                                             user = main.getApi().getUserManager().getUser(target);
@@ -128,7 +165,7 @@ public class AziendaCommand implements CommandExecutor {
                                             Dipendente dipendente = new Dipendente(main, target, azienda, p);
                                             main.getPlayerManager().addDipendente(target, dipendente);
                                         } else {
-                                            utilsChat.sendMessage(p, "Un direttore non può essere dipendente");
+                                            utilsChat.sendMessage(p, cf.getInvalidCommand());
                                         }
                                         return true;
                                     case "remove":

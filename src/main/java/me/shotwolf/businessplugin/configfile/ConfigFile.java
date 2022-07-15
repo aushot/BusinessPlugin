@@ -55,6 +55,13 @@ aziendalistlayout: "$v $n" #v -> vat azienda ||||||||  $n -> business name
     private String AziendaList;
     private String AziendaListLayout;
 
+    private String ArleadyDirector;
+    private String SubDirectorAdded;
+    private String SubDirectorRemoved;
+    private String ChatbusinessActivated;
+    private String ChatbusinessDeactivated;
+    private String DirectorAdded;
+    private String ViceDirectorAdded;
 
 
     private String ReceiptName;
@@ -91,7 +98,15 @@ aziendalistlayout: "$v $n" #v -> vat azienda ||||||||  $n -> business name
         BusinessCreated = main.getConfig().getString("businesscreated");
         SQLError = main.getConfig().getString("sqlerror");
         AziendaList = main.getConfig().getString("aziendalist");
-        AziendaListLayout = main .getConfig().getString("aziendalistlayout");
+        AziendaListLayout = main.getConfig().getString("aziendalistlayout");
+
+        ArleadyDirector = main.getConfig().getString("arleadydirector");
+        SubDirectorAdded = main.getConfig().getString("subdirectoradded");
+        SubDirectorRemoved = main.getConfig().getString("subdirectorremoved");
+        ChatbusinessActivated = main.getConfig().getString("chatbusinessactivated");
+        ChatbusinessDeactivated = main.getConfig().getString("chatbusinessdeactivated");
+        DirectorAdded = main.getConfig().getString("directoradded");
+        ViceDirectorAdded = main.getConfig().getString("vicedirectoradded");
 
     }
 
@@ -209,5 +224,32 @@ aziendalistlayout: "$v $n" #v -> vat azienda ||||||||  $n -> business name
 
     public String getReceiptName() {
         return ReceiptName;
+    }
+
+    public String getViceDirectorAdded() {
+        return ViceDirectorAdded;
+    }
+
+    public String getArleadyDirector() {
+        return ArleadyDirector;
+    }
+
+    public String getChatbusinessActivated() {
+        return ChatbusinessActivated;
+    }
+
+    public String getSubDirectorAdded() {
+        return SubDirectorAdded;
+    }
+
+    public String getChatbusinessDeactivated() {
+        return ChatbusinessDeactivated;
+    }
+
+    public String getDirectorAdded() {
+        return DirectorAdded;
+    }
+    public String getSubDirectorRemoved() {
+        return SubDirectorRemoved;
     }
 }
