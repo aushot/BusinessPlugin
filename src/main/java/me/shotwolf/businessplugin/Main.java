@@ -49,6 +49,7 @@ public final class Main extends JavaPlugin {
         }
 
         loadDatabase();
+        getDatabase().createTable(this);
 
         playerManager = new PlayerManager(); //inizialize Player Manager Object
 
@@ -113,12 +114,21 @@ public final class Main extends JavaPlugin {
 
     @Override
     public void reloadConfig() {
+        getDatabase().disconnect();
+
         super.reloadConfig();
 
         saveDefaultConfig();
         config = getConfig();
         config.options().copyDefaults(true);
         saveConfig();
+
+        playerManager = new PlayerManager();
+
+        loadDatabase();
+        loadBusiness();
+        loadDipendenti();
+        loadViceDirettori();
     }
 
     public void loadCommands(){
