@@ -25,8 +25,8 @@ Director:
 # Commands:
 - /azienda list -> view all the business in the server
 - /azienda reload -> reload the config file and the link with your DB
-- /azienda create [businessname] -> create a business
-- /azienda delete [businessname] -> delete a business
+- /azienda create [businessname] directorname -> create a business
+- /azienda delete [businessname] directorname -> delete a business
 #
 - /azienda [businessname] add [playername] -> hire a employer
 - /azienda [businessname] remove [playername] -> dismiss a employer
