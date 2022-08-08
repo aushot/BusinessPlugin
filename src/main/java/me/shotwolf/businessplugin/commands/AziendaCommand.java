@@ -31,23 +31,24 @@ public class AziendaCommand implements CommandExecutor {
         user.data().add(Node.builder(permission).build());
         main.getApi().getUserManager().saveUser(user);
     }
-    public void removePermission(User user, String permission){
-        user.data().remove(Node. builder(permission).build());
+
+    public void removePermission(User user, String permission) {
+        user.data().remove(Node.builder(permission).build());
         main.getApi().getUserManager().saveUser(user);
     }
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-        if(sender instanceof Player) {
+        if (sender instanceof Player) {
             cf = new ConfigFile(main);
             Player p = (Player) sender;
 
-            switch (args.length){ //controlla quanti arguments ci sono
+            switch (args.length) { //controlla quanti arguments ci sono
                 case 0:
                     utilsChat.sendMessage(p, cf.getInvalidCommand()); //da fare nel config
                     break;
                 case 1:
-                    switch (args[0]){ //controlla il primo args
+                    switch (args[0]) { //controlla il primo args
                         case "list":
                             if (p.hasPermission("azienda.list")) {
                                 utilsChat.sendMessage(p, cf.getAziendaList());
@@ -57,7 +58,7 @@ public class AziendaCommand implements CommandExecutor {
                             }
                             return true;
                         case "reload":
-                            if(p.hasPermission("azienda.reload")){
+                            if (p.hasPermission("azienda.reload")) {
                                 main.reloadConfig();
                                 utilsChat.sendMessage(p, "Plugin reloaded"); //da fare nel config
                             } else {
@@ -68,39 +69,50 @@ public class AziendaCommand implements CommandExecutor {
                             utilsChat.sendMessage(p, cf.getInvalidCommand());
                             return false;
                     }
-                case 2:
-                    if(p.hasPermission("azienda.admin")) {
+                case 3:
+                    if (p.hasPermission("azienda.admin")) {
                         switch (args[0]) {//controlla il primo args
                             case "create":
-                                if(main.getPlayerManager().getDirettore(p.getUniqueId()) == null) {
-                                    try {
-                                        Azienda azienda = new Azienda(main, args[1], p);
-                                        Direttore direttore = new Direttore(main, p.getUniqueId(), azienda, p);
+                                Player target = Bukkit.getPlayerExact(args[2]);
 
-                                        main.getPlayerManager().addAzienda(args[1], azienda);
-                                        main.getPlayerManager().addDirettore(p.getUniqueId(), direttore);
+                                if (target != null) {
+                                    if (main.getPlayerManager().getDirettore(target.getUniqueId()) == null) {
+                                        try {
+                                            Azienda azienda = new Azienda(main, args[1], p);
+                                            Direttore direttore = new Direttore(main, target.getUniqueId(), azienda, target);
 
-                                        User user = main.getApi().getUserManager().getUser(p.getUniqueId());
-                                        addPermission(user, "direttore." + args[1].toLowerCase());
-                                    } catch (SQLException e) {
-                                        e.printStackTrace();
-                                        utilsChat.sendMessage(p, cf.getSQLError());
+                                            main.getPlayerManager().addAzienda(args[1], azienda);
+                                            main.getPlayerManager().addDirettore(target.getUniqueId(), direttore);
+
+                                            User user = main.getApi().getUserManager().getUser(target.getUniqueId());
+                                            addPermission(user, "direttore." + args[1].toLowerCase());
+                                        } catch (SQLException e) {
+                                            e.printStackTrace();
+                                            utilsChat.sendMessage(p, cf.getSQLError());
+                                        }
+                                    } else {
+                                        utilsChat.sendMessage(p, cf.getArleadyDirector());
                                     }
                                 } else {
-                                    utilsChat.sendMessage(p, cf.getArleadyDirector());
+                                    utilsChat.sendMessage(p, "il player non esiste o non è online"); // config yml
                                 }
                                 return true;
                             case "delete":
                                 String nome_azienda = args[1];
+                                target = Bukkit.getPlayerExact(args[2]);
 
                                 if (main.getPlayerManager().getAzienda(nome_azienda) != null) {
-                                    main.getPlayerManager().removeDirettore(main, p.getUniqueId());
-                                    main.getPlayerManager().removeAzienda(main, nome_azienda);
+                                    if (target != null && main.getPlayerManager().getDirettore(target.getUniqueId()) != null && main.getPlayerManager().getDirettore(target.getUniqueId()).getAzienda().getName().equalsIgnoreCase(nome_azienda)) {
+                                        main.getPlayerManager().removeDirettore(main, p.getUniqueId());
+                                        main.getPlayerManager().removeAzienda(main, nome_azienda);
 
-                                    User user = main.getApi().getUserManager().getUser(p.getUniqueId());
-                                    removePermission(user, "direttore." + args[1].toLowerCase());
+                                        User user = main.getApi().getUserManager().getUser(p.getUniqueId());
+                                        removePermission(user, "direttore." + args[1].toLowerCase());
 
-                                    utilsChat.sendMessage(p, cf.getBusinessDeleted());
+                                        utilsChat.sendMessage(p, cf.getBusinessDeleted());
+                                    } else {
+                                        utilsChat.sendMessage(p, "non è direttore dell'azienda"); // config yml
+                                    }
                                 } else {
                                     utilsChat.sendMessage(p, cf.getBusinessNotExist());
                                 }
@@ -110,10 +122,10 @@ public class AziendaCommand implements CommandExecutor {
                                 return false;
                         }
                     }
-                case 3:
+
                     String nome_azienda = args[0];
 
-                    if(p.hasPermission("direttore." + nome_azienda)) { //azienda (AZIENDA) add/remove (PLAYER)
+                    if (p.hasPermission("direttore." + nome_azienda)) { //azienda (AZIENDA) add/remove (PLAYER)
                         if (main.getPlayerManager().getAzienda(nome_azienda) != null) {
                             if (Bukkit.getServer().getPlayer(args[2]) != null) {
                                 User user;
@@ -121,8 +133,8 @@ public class AziendaCommand implements CommandExecutor {
 
                                 switch (args[1].toLowerCase()) {
                                     case "promote": //azienda (AZIENDA) promote/degrade (PLAYER)
-                                        if(main.getPlayerManager().getDipendente(target) != null){
-                                            if(main.getPlayerManager().getDipendente(target).getAzienda().getName().equalsIgnoreCase(nome_azienda)){
+                                        if (main.getPlayerManager().getDipendente(target) != null) {
+                                            if (main.getPlayerManager().getDipendente(target).getAzienda().getName().equalsIgnoreCase(nome_azienda)) {
                                                 Azienda azienda = main.getPlayerManager().getAzienda(nome_azienda);
                                                 user = main.getApi().getUserManager().getUser(target);
 
@@ -138,8 +150,8 @@ public class AziendaCommand implements CommandExecutor {
                                         }
                                         return true;
                                     case "degrade":
-                                        if(main.getPlayerManager().getViceDirettore(target) != null){
-                                            if(main.getPlayerManager().getViceDirettore(target).getAzienda().getName().equalsIgnoreCase(nome_azienda)){
+                                        if (main.getPlayerManager().getViceDirettore(target) != null) {
+                                            if (main.getPlayerManager().getViceDirettore(target).getAzienda().getName().equalsIgnoreCase(nome_azienda)) {
                                                 Azienda azienda = main.getPlayerManager().getAzienda(nome_azienda);
                                                 user = main.getApi().getUserManager().getUser(target);
 
@@ -155,7 +167,7 @@ public class AziendaCommand implements CommandExecutor {
                                         }
                                         return true;
                                     case "add":
-                                        if(main.getPlayerManager().getDirettore(target) == null) {
+                                        if (main.getPlayerManager().getDirettore(target) == null) {
 
                                             Azienda azienda = main.getPlayerManager().getAzienda(nome_azienda);
 
@@ -170,7 +182,7 @@ public class AziendaCommand implements CommandExecutor {
                                         return true;
                                     case "remove":
                                         target = Bukkit.getServer().getPlayerExact(args[2]).getUniqueId();
-                                        if(main.getPlayerManager().getDipendente(target)!=null) {
+                                        if (main.getPlayerManager().getDipendente(target) != null) {
                                             if (main.getPlayerManager().getDipendente(target).getAzienda().getName().equalsIgnoreCase(nome_azienda)) {
                                                 if (main.getPlayerManager().getAzienda(nome_azienda) != null) {
                                                     main.getPlayerManager().removeDipendente(main, target);
